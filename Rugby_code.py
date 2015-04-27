@@ -276,7 +276,7 @@ sns.lmplot(x='clean_breaks', y='defenders_beat', data=rugby)
 
 sns.lmplot(x='passes', y='points', data=rugby, order=2) #positive
 sns.lmplot(x='meters_run', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='clean_breaks', y='points', data=rugby, order=2) #positive
+sns.lmplot(x='clean_breaks', y='points',data=rugby, order=2) #positive
 sns.lmplot(x='defenders_beat', y='points', data=rugby, order=2) #positive
 sns.lmplot(x='rucks_won', y='points', data=rugby, order=2) #slightly negative
 sns.lmplot(x='rucks_started', y='points', data=rugby, order=2) #slightly negative
@@ -292,8 +292,26 @@ sns.lmplot(x='tackle_success', y='points', data=rugby, order=2) #positive
 
 ### 
 
+rugby.points.hist(bins=40)
+plt.title("Frequency of Points Scored by Single Team")
+plt.xlabel('Points Scored')
+plt.ylabel('Frequency')
+plt.show()
+
+rugby.tackles_made.hist(bins=40)
+plt.title("Distribution of Tackles per Game")
+plt.xlabel('Tackles Made')
+plt.ylabel('Frequency')
+plt.show()
+
+rugby[rugby.home == 1].win.hist(bins=2)
+plt.title("Distribution of Tackles Missed per Game")
+plt.xlabel('Tackles Missed')
+plt.ylabel('Frequency')
+plt.show()
 
 
+rugby[rugby.home == 1].win.value_counts()
 
 
 
