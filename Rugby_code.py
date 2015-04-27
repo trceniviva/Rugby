@@ -243,6 +243,11 @@ rugby['points'] = rugby.try_points + rugby.con_points + rugby.pen_points
 
 rugby['meters_per_run'] = rugby.meters_run / rugby.runs
 
+''' points_against column '''
+
+for row in rugby:
+    rugby[rugby.game == ]
+
 ### Visualizations ###
 
 pd.scatter_matrix(rugby)
