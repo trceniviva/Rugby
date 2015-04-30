@@ -130,8 +130,6 @@ rugby['scrum_success'] = maul_success
 
 del rugby['scrums']
 
-rugby.head()
-
 '''and again for lineouts'''
 
 lo_lost = []
@@ -243,14 +241,323 @@ rugby['points'] = rugby.try_points + rugby.con_points + rugby.pen_points
 
 rugby['meters_per_run'] = rugby.meters_run / rugby.runs
 
-''' points_against column '''
+''' points_against and points_diff column '''
 
-for row in rugby:
-    rugby[rugby.game == ]
+points = rugby.points
+points = list(points)
 
-### Visualizations ###
+game = rugby.game
+game = list(game)
 
-pd.scatter_matrix(rugby)
+win = rugby.win
+win = list(win)
+
+points_diff = []
+
+x_list = list(range(0,240))
+
+for x in x_list:
+    if x < 239:        
+        if game[x] == game[x+1]:
+            points_diff.append((points[x]) - (points[x+1]))
+            points_diff.append((-1)*((points[x]) - (points[x+1])))
+
+rugby['points_diff'] = points_diff
+
+rugby['points_against'] = rugby.points - rugby.points_diff
+
+'''opponent column'''
+
+teams = rugby.team
+teams = list(teams)
+
+opponent = []
+
+for x in x_list:
+    if x < 239:        
+        if game[x] == game[x+1]:
+            opponent.append(teams[x+1])
+            opponent.append(teams[x])
+
+rugby['opponent'] = opponent
+
+########################################################################
+
+### error producer funcion ###
+
+def error_producer(words):
+    bath_pred = words[0]
+    north_pred = words[1]
+    glou_pred = words[2]
+    irish_pred = words[3]
+    quins_pred = words[4]
+    leic_pred = words[5]
+    new_pred = words[6]
+    sar_pred = words[7]
+    wasp_pred = words[8]
+    sale_pred = words[9]
+    welsh_pred = words[10]
+    exeter_pred = words[11]
+
+    predictions = []
+    
+    ### adding round 1 predicted differences
+    
+    predictions.append(north_pred-glou_pred)
+    predictions.append(irish_pred-quins_pred)
+    predictions.append(leic_pred-new_pred)
+    predictions.append(sar_pred-wasp_pred)
+    predictions.append(sale_pred-bath_pred)
+    predictions.append(welsh_pred-exeter_pred)
+    
+    ### adding round 2 predicted differences
+    
+    predictions.append(quins_pred-sar_pred)
+    predictions.append(exeter_pred-leic_pred)
+    predictions.append(glou_pred-sale_pred)
+    predictions.append(bath_pred-welsh_pred)
+    predictions.append(new_pred-irish_pred)
+    predictions.append(wasp_pred-north_pred)
+    
+    ### adding round 3 predicted differences
+    
+    predictions.append(glou_pred-exeter_pred)
+    predictions.append(bath_pred-leic_pred)
+    predictions.append(irish_pred-sar_pred)
+    predictions.append(quins_pred-wasp_pred)
+    predictions.append(sale_pred-welsh_pred)
+    predictions.append(new_pred-north_pred)
+    
+    ### adding round 4 predicted differences
+    
+    predictions.append(welsh_pred-glou_pred)
+    predictions.append(north_pred-bath_pred)
+    predictions.append(sar_pred-sale_pred)
+    predictions.append(leic_pred-irish_pred)
+    predictions.append(wasp_pred-new_pred)
+    predictions.append(exeter_pred-quins_pred)
+    
+    ### adding round 5 predicted differences
+    
+    predictions.append(bath_pred-sar_pred)
+    predictions.append(glou_pred-leic_pred)
+    predictions.append(irish_pred-north_pred)
+    predictions.append(quins_pred-welsh_pred)
+    predictions.append(new_pred-exeter_pred)
+    predictions.append(sale_pred-wasp_pred)
+    
+    ### adding round 6 predicted differences
+    
+    predictions.append(leic_pred-quins_pred)
+    predictions.append(north_pred-sale_pred)
+    predictions.append(sar_pred-glou_pred)
+    predictions.append(exeter_pred-irish_pred)
+    predictions.append(welsh_pred-new_pred)
+    predictions.append(wasp_pred-bath_pred)
+    
+    ### adding round 7 predicted differences
+    
+    predictions.append(north_pred-exeter_pred)
+    predictions.append(glou_pred-quins_pred)
+    predictions.append(bath_pred-new_pred)
+    predictions.append(sale_pred-irish_pred)
+    predictions.append(wasp_pred-welsh_pred)
+    predictions.append(leic_pred-sar_pred)
+    
+    ### adding round 8 predicted differences
+    
+    predictions.append(new_pred-glou_pred)
+    predictions.append(quins_pred-sale_pred)
+    predictions.append(irish_pred-bath_pred)
+    predictions.append(exeter_pred-wasp_pred)
+    predictions.append(welsh_pred-leic_pred)
+    predictions.append(sar_pred-north_pred)
+    
+    ### add round 9 predicted differences
+    
+    predictions.append(bath_pred-quins_pred)
+    predictions.append(exeter_pred-sar_pred)
+    predictions.append(leic_pred-wasp_pred)
+    predictions.append(new_pred-sale_pred)
+    predictions.append(welsh_pred-north_pred)
+    predictions.append(irish_pred-glou_pred)
+    
+    ### round 10 predicted differences
+    
+    predictions.append(sale_pred-exeter_pred)
+    predictions.append(glou_pred-bath_pred)
+    predictions.append(north_pred-leic_pred)
+    predictions.append(sar_pred-welsh_pred)
+    predictions.append(quins_pred-new_pred)
+    predictions.append(wasp_pred-irish_pred)
+    
+    ### round 11 predicted differences
+    
+    predictions.append(irish_pred-welsh_pred)
+    predictions.append(quins_pred-north_pred)
+    predictions.append(new_pred-sar_pred)
+    predictions.append(sale_pred-leic_pred)
+    predictions.append(bath_pred-exeter_pred)
+    predictions.append(glou_pred-wasp_pred)    
+    
+    x_len = list(range(0,len(predictions)))
+    
+    psq_less_actual = []
+    
+    for x in x_len:
+        psq_less_actual.append((predictions[x] - actual_diff[x])**2)
+        
+    print sum(psq_less_actual)
+
+########################################################################
+########################################################################
+
+actual_diff = []
+
+for x in x_list:
+    if rugby.home[x] == 1:
+        if rugby.round[x] < 12:
+            actual_diff.append(rugby.points_diff[x])
+
+round_12_diff = []
+
+for x in x_list:
+    if rugby.home[x] == 1:
+        if rugby.round[x] == 12:
+            round_12_diff.append(rugby.points_diff[x])
+            
+### using average points per game to predict games
+
+bath_ppg = 27.10
+north_ppg = 28.05
+glou_ppg = 24.25
+irish_ppg = 19.30
+quins_ppg = 19.70
+leic_ppg = 20.10
+new_ppg = 20.50
+sar_ppg = 28.80
+wasp_ppg = 30.40
+sale_ppg = 22.20
+welsh_ppg = 10.30
+exeter_ppg = 27.35
+
+error_avg_ppg = [bath_ppg,north_ppg,glou_ppg,
+                 irish_ppg,quins_ppg,leic_ppg,
+                 new_ppg,sar_ppg,wasp_ppg,
+                 sale_ppg,welsh_ppg,exeter_ppg]
+
+error_producer(error_avg_ppg)
+
+### using average point differential to predict games
+
+bath_pd = 9.20
+north_pd = 9.15
+glou_pd = -1.35
+irish_pred = -5.70
+quins_pred = -2.80
+leic_pred = .95
+new_pred = -3.85
+sar_pred = 9.95
+wasp_pred = 7.80
+sale_pred = 1.85
+welsh_pred = -32.80
+exeter_pred = 7.60
+
+error_avg_pd = [bath_pred,north_pred,glou_pred,irish_pred,quins_pred,leic_pred,new_pred,sar_pred,wasp_pred,sale_pred,welsh_pred,exeter_pred]
+
+error_producer(error_avg_pd)
+
+########################################################################
+########################################################################
+
+x_list = list(range(0,240))
+
+predictions = []
+
+for x in x_list:
+    if teams[x] == 'bath':
+        predictions.append(bath_pred)
+    elif teams[x] == 'northampton':
+        predictions.append(north_pred)
+    elif teams[x] == 'gloucester':
+        predictions.append(glou_pred)
+    elif teams[x] == 'irish':
+        predictions.append(irish_pred)
+    elif teams[x] == 'harlequins':
+        predictions.append(quins_pred)
+    elif teams[x] == 'leicester':
+        predictions.append(leic_pred)
+    elif teams[x] == 'newcastle':
+        predictions.append(new_pred)
+    elif teams[x] == 'saracens':
+        predictions.append(sar_pred)
+    elif teams[x] == 'wasps':
+        predictions.append(wasp_pred)
+    elif teams[x] == 'sale':
+        predictions.append(sale_pred)
+    elif teams[x] == 'welsh':
+        predictions.append(welsh_pred)
+    else:
+        predictions.append(exeter_pred)
+
+pred_error = []
+
+for x in x_list:
+    if x < 239:
+        if game[x] == game[x+1]:
+            pred_error.append((((5.85 + predictions[x]) - predictions[x+1]) - (points[x]-points[x+1]))**2)
+
+sum(pred_error)
+
+
+
+########################################################################
+
+## Team DataFrames ##
+
+bath_df = rugby[rugby.team == 'bath']
+northampton_df = rugby[rugby.team == 'northampton']
+gloucester_df = rugby[rugby.team == 'gloucester']
+irish_df = rugby[rugby.team == 'irish']
+harlequins_df = rugby[rugby.team == 'harlequins']
+leicester_df = rugby[rugby.team == 'leicester']
+newcastle_df = rugby[rugby.team == 'newcastle']
+saracens_df = rugby[rugby.team == 'saracens']
+wasps_df = rugby[rugby.team == 'wasps']
+sale_df = rugby[rugby.team == 'sale']
+welsh_df = rugby[rugby.team == 'welsh']
+exeter_df = rugby[rugby.team == 'exeter']
+
+########################################################################
+
+### resetting the index for all of these data frames
+### in order to have a consecutive index corresponding with 'round'
+
+bath = bath_df.set_index(['round'], drop=False)
+northampton = northampton_df.set_index(['round'], drop=False)
+gloucester = gloucester_df.set_index(['round'], drop=False)
+irish = irish_df.set_index(['round'],drop=False)
+harlequins = harlequins_df.set_index(['round'], drop=False)
+leicester = leicester_df.set_index(['round'], drop=False)
+newcastle = newcastle_df.set_index(['round'], drop=False)
+saracens = saracens_df.set_index(['round'], drop=False)
+wasps = wasps_df.set_index(['round'],drop=False)
+sale = sale_df.set_index(['round'],drop=False)
+welsh = welsh_df.set_index(['round'],drop=False)
+exeter = exeter_df.set_index(['round'],drop=False)
+
+########################################################################
+
+bath[bath.round == 3]
+
+########################################################################
+
+# Visualizations #
+
+########################################################################
+
+
+pd.scatter_matrix(bath_df)
 plt.show()
 
 rugby.groupby('team').points.mean().plot(kind='bar', title='Average Number of Points per Game')
@@ -305,28 +612,15 @@ plt.ylabel('Frequency')
 plt.show()
 
 rugby[rugby.home == 1].win.hist(bins=2)
-plt.title("Distribution of Tackles Missed per Game")
-plt.xlabel('Tackles Missed')
+plt.title("Win Rate for Home Teams")
+plt.xlabel('Win')
 plt.ylabel('Frequency')
 plt.show()
 
+rugby[rugby.home == 0].win.hist(bins=2)
+plt.title("Win Rate for Away Teams")
+plt.xlabel('Win')
+plt.ylabel('Frequency')
+plt.show()
 
 rugby[rugby.home == 1].win.value_counts()
-
-
-
-## Team DataFrames ##
-
-bath_df = rugby[rugby.team == 'bath']
-northampton_df = rugby[rugby.team == 'northampton']
-gloucester_df = rugby[rugby.team == 'gloucester']
-irish_df = rugby[rugby.team == 'irish']
-harlequins_df = rugby[rugby.team == 'harlequins']
-leicester_df = rugby[rugby.team == 'leicester']
-newcastle_df = rugby[rugby.team == 'newcastle']
-saracens_df = rugby[rugby.team == 'saracens']
-wasps_df = rugby[rugby.team == 'wasps']
-sale_df = rugby[rugby.team == 'sale']
-welsh_df = rugby[rugby.team == 'welsh']
-exeter_df = rugby[rugby.team == 'exeter']
-
