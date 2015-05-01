@@ -283,6 +283,24 @@ rugby['opponent'] = opponent
 
 ### adding a column that indicates the teams average point differential throughout the season
 
+bath_pd = 9.20
+north_pd = 9.15
+glou_pd = -1.35
+irish_pd = -5.70
+quins_pd = -2.80
+leic_pd = .95
+new_pd = -3.85
+sar_pd = 9.95
+wasp_pd = 7.80
+sale_pd = 1.85
+welsh_pd = -32.80
+exeter_pd = 7.60
+
+error_avg_pd = [bath_pd,north_pd,glou_pd,
+                irish_pd,quins_pd,leic_pd,
+                new_pd,sar_pd,wasp_pd,
+                sale_pd,welsh_pd,exeter_pd]
+
 x_list = list(range(0,240))
 
 team_avg_pd = []
@@ -318,6 +336,72 @@ for x in x_list:
 
 rugby['team_avg_pd'] = team_avg_pd
 
+
+########### creating a columen for league points based on 
+
+league_points_single = []
+
+for x in x_list:
+    league_points = []
+    if x < 239:
+        if rugby.game[x] == rugby.game[x+1]:
+            if rugby.tries[x] >= 4:
+                league_points.append(1)
+            else:
+                league_points.append(0)
+            if rugby.win[x] == 1:
+                league_points.append(4)
+            else:
+                league_points.append(0)
+                if -7 < rugby.points_diff[x] < (-1):
+                    league_points.append(1)
+                else:
+                    league_points.append(0)
+                    if rugby.win[x] == rugby.win[x+1]:
+                        league_points.append(2)
+                    else:
+                        league_points.append(0)
+            league_points_single.append(sum(league_points))
+        elif rugby.game[x] == rugby.game[x - 1]:
+            if rugby.tries[x] >= 4:
+                league_points.append(1)
+            else:
+                league_points.append(0)
+            if rugby.win[x] == 1:
+                league_points.append(4)
+            else:
+                league_points.append(0)
+                if -7 < rugby.points_diff[x] < (-1):
+                    league_points.append(1)
+                else:
+                    league_points.append(0)
+                    if rugby.win[x] == rugby.win[x - 1]:
+                        league_points.append(2)
+                    else:
+                        league_points.append(0)
+            league_points_single.append(sum(league_points))
+    else:
+        if rugby.tries[x] >= 4:
+                league_points.append(1)
+        else:
+            league_points.append(0)
+            if rugby.win[x] == 1:
+                league_points.append(4)
+            else:
+                league_points.append(0)
+                if -7 < rugby.points_diff[x] < (-1):
+                    league_points.append(1)
+                else:
+                    league_points.append(0)
+                    if rugby.win[x] == rugby.win[x - 1]:
+                        league_points.append(2)
+                    else:
+                        league_points.append(0)
+        league_points_single.append(sum(league_points))
+    
+league_points_single
+
+rugby['league_points_awarded'] = league_points_single
 
 ########################################################################
 

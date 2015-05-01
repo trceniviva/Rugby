@@ -5,6 +5,13 @@ Created on Fri May  1 09:23:13 2015
 @author: Trevor1
 """
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.table import Table, Column
+import seaborn as sns
+
 # ( prediction - actual ) ^ 2
 
 # calculating the predicted point difference for that team in that game
@@ -59,7 +66,9 @@ for x in x_list:
 
 sum(win_accuracy)
 
-###########################################
+##########################################################################
+### function for testing different home field advantages ###
+##########################################################################
 
 def homeAdvantage(number):
     
@@ -149,6 +158,8 @@ def homeAdvantage(number):
     print(float(sum(error_home)))
     
 
+##### a really bad way to do it, but figuring out the best value for home field advantage
+
 deci = [5.8,5.9,6.0,6.1,6.2,6.3,6.4,6.5,6.6,6.7,6.8,6.9,7.0,7.1]
 
 x_deci = list(range(0,14))
@@ -166,5 +177,33 @@ for x in x_centi:
     print centi[x]
     print homeAdvantage(centi[x])
 
-### based on this model, home-field advantage equates to roughly 5.95 points/game
+### when using point differential as "strength," the model is improved by
+### incorporating a home-field advantage of about 5.95 points
 
+##########################################################################
+### creating a column that indicates each teams current table-rank ###
+##########################################################################
+
+##########################################################################
+### first, create a function that gives a team's rank based on round ###
+##########################################################################
+
+y_rounds = list(range(0,20))
+
+league_points_todate = []
+
+games_list = [] 
+for x in x_list:
+    if rugby.team[x] == 'northampton':
+        games = rugby[rugby.index < x][rugby.team == 'northampton'].league_points_awarded
+        games_list.append(sum(games))
+games_list[2]
+
+def league_points(this_team,this_round):   
+    games_list = [] 
+    for x in x_list:
+        if rugby.team[x] == this_team:
+            games = rugby[rugby.index < x][rugby.team == this_team].league_points_awarded
+            games_list.append(sum(games))
+    games_list[this_round]
+        
