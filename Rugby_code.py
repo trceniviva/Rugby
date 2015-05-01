@@ -281,6 +281,44 @@ for x in x_list:
 
 rugby['opponent'] = opponent
 
+### adding a column that indicates the teams average point differential throughout the season
+
+x_list = list(range(0,240))
+
+team_avg_pd = []
+
+for x in x_list:
+    if rugby.round[x] < 12:
+        if rugby.team[x] == 'bath':
+            team_avg_pd.append(bath_pd)
+        elif rugby.team[x] == 'northampton':
+            team_avg_pd.append(north_pd)
+        elif rugby.team[x] == 'gloucester':
+            team_avg_pd.append(glou_pd)
+        elif rugby.team[x] == 'irish':
+            team_avg_pd.append(irish_pd)
+        elif rugby.team[x] == 'harlequins':
+            team_avg_pd.append(quins_pd)
+        elif rugby.team[x] == 'leicester':
+            team_avg_pd.append(leic_pd)
+        elif rugby.team[x] == 'newcastle':
+            team_avg_pd.append(new_pd)
+        elif rugby.team[x] == 'saracens':
+            team_avg_pd.append(sar_pd)
+        elif rugby.team[x] == 'wasps':
+            team_avg_pd.append(wasp_pd)
+        elif rugby.team[x] == 'sale':
+            team_avg_pd.append(sale_pd)
+        elif rugby.team[x] == 'welsh':
+            team_avg_pd.append(welsh_pd)
+        elif rugby.team[x] == 'exeter':
+            team_avg_pd.append(exeter_pd)
+    else:
+        team_avg_pd.append(0)
+
+rugby['team_avg_pd'] = team_avg_pd
+
+
 ########################################################################
 
 ### error producer funcion ###
@@ -491,38 +529,6 @@ error_producer(error_avg_pd)
 
 
 ###### model for using avg point differential #####
-
-x_list = list(range(0,240))
-
-team_avg_pd = []
-
-for x in x_list:
-    if rugby.team[x] == 'bath':
-        team_avg_pd.append(bath_pd)
-    elif rugby.team[x] == 'northampton':
-        team_avg_pd.append(north_pd)
-    elif rugby.team[x] == 'gloucester':
-        team_avg_pd.append(glou_pd)
-    elif rugby.team[x] == 'irish':
-        team_avg_pd.append(irish_pd)
-    elif rugby.team[x] == 'harlequins':
-        team_avg_pd.append(quins_pd)
-    elif rugby.team[x] == 'leicester':
-        team_avg_pd.append(leic_pd)
-    elif rugby.team[x] == 'newcastle':
-        team_avg_pd.append(new_pd)
-    elif rugby.team[x] == 'saracens':
-        team_avg_pd.append(sar_pd)
-    elif rugby.team[x] == 'wasps':
-        team_avg_pd.append(wasp_pd)
-    elif rugby.team[x] == 'sale':
-        team_avg_pd.append(sale_pd)
-    elif rugby.team[x] == 'welsh':
-        team_avg_pd.append(welsh_pd)
-    elif rugby.team[x] == 'exeter':
-        team_avg_pd.append(exeter_pd)
-
-rugby['team_avg_pd'] = team_avg_pd
 
 pred_error = []
 
