@@ -192,18 +192,19 @@ y_rounds = list(range(0,20))
 
 league_points_todate = []
 
-games_list = [] 
+northampton_table = []
 for x in x_list:
     if rugby.team[x] == 'northampton':
         games = rugby[rugby.index < x][rugby.team == 'northampton'].league_points_awarded
-        games_list.append(sum(games))
-games_list[2]
+        northampton_table.append(sum(games))
+northampton_table
 
-def league_points(this_team,this_round):   
+def league_points(a,b):   
     games_list = [] 
     for x in x_list:
-        if rugby.team[x] == this_team:
-            games = rugby[rugby.index < x][rugby.team == this_team].league_points_awarded
+        if rugby.team[x] == a:
+            games = rugby[rugby.index < x][rugby.team == a].league_points_awarded
             games_list.append(sum(games))
-    games_list[this_round]
+    games_list
+    games_list[b]
         
