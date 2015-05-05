@@ -24,31 +24,31 @@ predicted_win_loss = []
 
 for x in x_list:
     if x == 0:
-        expected = (rugby.team_avg_pd[x] - rugby.team_avg_pd[x+1])
+        expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x+1])
         predicted_points_diff.append(expected)
-        if expected > 0:
+        if expected > 0.0:
             predicted_win_loss.append(1)
         else:
             predicted_win_loss.append(0)
     elif 0 < x < 239:
         if rugby.game[x] == rugby.game[x+1]:
-            expected = (rugby.team_avg_pd[x] - rugby.team_avg_pd[x+1])
+            expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x+1])
             predicted_points_diff.append(expected)
-            if expected > 0:
+            if expected > 0.0:
                 predicted_win_loss.append(1)
             else:
                 predicted_win_loss.append(0)
-        if rugby.game[x] == rugby.game[x-1]:
-            expected = (rugby.team_avg_pd[x] - rugby.team_avg_pd[x-1])
+        elif rugby.game[x] == rugby.game[x-1]:
+            expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x-1])
             predicted_points_diff.append(expected)
-            if expected > 0:
+            if expected > 0.0:
                 predicted_win_loss.append(1)
             else:
                 predicted_win_loss.append(0)
     elif x == 239:
-        expected = (rugby.team_avg_pd[x] - rugby.team_avg_pd[x-1])
+        expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x-1])
         predicted_points_diff.append(expected)
-        if expected > 0:
+        if expected > 0.0:
             predicted_win_loss.append(1)
         else:
             predicted_win_loss.append(0)
@@ -188,9 +188,11 @@ for x in x_centi:
 ### first, create a function that gives a team's rank based on round ###
 ##########################################################################
 
-y_rounds = list(range(0,20))
+y_rounds = list(range(1,21))
 
 league_points_todate = []
+
+league_round = 7
 
 northampton_table = []
 for x in x_list:
@@ -199,12 +201,23 @@ for x in x_list:
         northampton_table.append(sum(games))
 northampton_table
 
-def league_points(a,b):   
+def league_points(a,b):
+    this_team = a
+    this_round = b
     games_list = [] 
     for x in x_list:
-        if rugby.team[x] == a:
-            games = rugby[rugby.index < x][rugby.team == a].league_points_awarded
+        if rugby.team[x] == this_team:
+            games = rugby[rugby.index < x][rugby.team == this_team].league_points_awarded
             games_list.append(sum(games))
     games_list
-    games_list[b]
-        
+    print games_list[this_round]
+
+table = []
+
+for x in x_list:
+    this_team = rugby.team[x]
+    this_round = rugby.round[x]
+    table_points = league_points(this_team,this_round)
+    table.append(table_points)
+
+table

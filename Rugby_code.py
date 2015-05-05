@@ -303,39 +303,70 @@ error_avg_pd = [bath_pd,north_pd,glou_pd,
 
 x_list = list(range(0,240))
 
-team_avg_pd = []
+r11_avg_pd = []
+r11_opp_pd = []
 
 for x in x_list:
     if rugby.round[x] < 12:
         if rugby.team[x] == 'bath':
-            team_avg_pd.append(bath_pd)
+            r11_avg_pd.append(bath_pd)
         elif rugby.team[x] == 'northampton':
-            team_avg_pd.append(north_pd)
+            r11_avg_pd.append(north_pd)
         elif rugby.team[x] == 'gloucester':
-            team_avg_pd.append(glou_pd)
+            r11_avg_pd.append(glou_pd)
         elif rugby.team[x] == 'irish':
-            team_avg_pd.append(irish_pd)
+            r11_avg_pd.append(irish_pd)
         elif rugby.team[x] == 'harlequins':
-            team_avg_pd.append(quins_pd)
+            r11_avg_pd.append(quins_pd)
         elif rugby.team[x] == 'leicester':
-            team_avg_pd.append(leic_pd)
+            r11_avg_pd.append(leic_pd)
         elif rugby.team[x] == 'newcastle':
-            team_avg_pd.append(new_pd)
+            r11_avg_pd.append(new_pd)
         elif rugby.team[x] == 'saracens':
-            team_avg_pd.append(sar_pd)
+            r11_avg_pd.append(sar_pd)
         elif rugby.team[x] == 'wasps':
-            team_avg_pd.append(wasp_pd)
+            r11_avg_pd.append(wasp_pd)
         elif rugby.team[x] == 'sale':
-            team_avg_pd.append(sale_pd)
+            r11_avg_pd.append(sale_pd)
         elif rugby.team[x] == 'welsh':
-            team_avg_pd.append(welsh_pd)
+            r11_avg_pd.append(welsh_pd)
         elif rugby.team[x] == 'exeter':
-            team_avg_pd.append(exeter_pd)
+            r11_avg_pd.append(exeter_pd)
     else:
-        team_avg_pd.append(0)
+        r11_avg_pd.append(0)
 
-rugby['team_avg_pd'] = team_avg_pd
+rugby['r11_avg_pd'] = r11_avg_pd
 
+for x in x_list:
+    if rugby.round[x] < 12:
+        if rugby.opponent[x] == 'bath':
+            r11_opp_pd.append(bath_pd)
+        elif rugby.opponent[x] == 'northampton':
+            r11_opp_pd.append(north_pd)
+        elif rugby.opponent[x] == 'gloucester':
+            r11_opp_pd.append(glou_pd)
+        elif rugby.opponent[x] == 'irish':
+            r11_opp_pd.append(irish_pd)
+        elif rugby.opponent[x] == 'harlequins':
+            r11_opp_pd.append(quins_pd)
+        elif rugby.opponent[x] == 'leicester':
+            r11_opp_pd.append(leic_pd)
+        elif rugby.opponent[x] == 'newcastle':
+            r11_opp_pd.append(new_pd)
+        elif rugby.opponent[x] == 'saracens':
+            r11_opp_pd.append(sar_pd)
+        elif rugby.opponent[x] == 'wasps':
+            r11_opp_pd.append(wasp_pd)
+        elif rugby.opponent[x] == 'sale':
+            r11_opp_pd.append(sale_pd)
+        elif rugby.opponent[x] == 'welsh':
+            r11_opp_pd.append(welsh_pd)
+        elif rugby.opponent[x] == 'exeter':
+            r11_opp_pd.append(exeter_pd)
+    else:
+        r11_opp_pd.append(0)
+
+rugby['r11_opp_pd'] = r11_opp_pd
 
 ########### creating a columen for league points based on 
 
@@ -403,7 +434,156 @@ league_points_single
 
 rugby['league_points_awarded'] = league_points_single
 
+###### creating columns for predicted points diff based on avg pd
+###### and then using that prediction to predict win/loss for that same game
+
+predicted_points_diff_avgPD = []
+predicted_win_loss_avgPD = []
+
+for x in x_list:
+    if x == 0:
+        expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x+1])
+        predicted_points_diff_avgPD.append(expected)
+        if expected > 0.0:
+            predicted_win_loss_avgPD.append(1)
+        else:
+            predicted_win_loss_avgPD.append(0)
+    elif 0 < x < 239:
+        if rugby.game[x] == rugby.game[x+1]:
+            expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x+1])
+            predicted_points_diff_avgPD.append(expected)
+            if expected > 0.0:
+                predicted_win_loss_avgPD.append(1)
+            else:
+                predicted_win_loss_avgPD.append(0)
+        elif rugby.game[x] == rugby.game[x-1]:
+            expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x-1])
+            predicted_points_diff_avgPD.append(expected)
+            if expected > 0.0:
+                predicted_win_loss_avgPD.append(1)
+            else:
+                predicted_win_loss_avgPD.append(0)
+    elif x == 239:
+        expected = (rugby.r11_avg_pd[x] - rugby.r11_avg_pd[x-1])
+        predicted_points_diff_avgPD.append(expected)
+        if expected > 0.0:
+            predicted_win_loss_avgPD.append(1)
+        else:
+            predicted_win_loss_avgPD.append(0)
+
+rugby['pred_PD'] = predicted_points_diff_avgPD
+rugby['w_l_avgPD'] = predicted_win_loss_avgPD
+
+
 ########################################################################
+### function for testing different home field advantages ###
+########################################################################
+
+
+########################################################################
+#### Now i'm going to create a data frame with fewer columns ###########
+########################################################################
+
+tidy_rugby = rugby[['season','round','game','team','home','opponent', 
+                    'w_l_avgPD','win','draw','points_diff',
+                    'pred_avgPD','r11_avg_pd','league_points_awarded','r11_opp_pd']]
+
+tidy_rugby['pred_PD'] = tidy_rugby['pred_avgPD']
+
+tidy_rugby = tidy_rugby[['season','round','game','team','r11_avg_pd','r11_opp_pd',
+                         'pred_PD','points_diff','home','opponent', 
+                         'w_l_avgPD','win','draw',
+                         'league_points_awarded']]
+predPD_home = []
+
+for x in x_list:
+    if tidy_rugby.home[x] == 1:
+        predPD_home.append(tidy_rugby.r11_avg_pd[x] + 5.95 - tidy_rugby.r11_opp_pd[x])
+    elif tidy_rugby.home[x] == 0:
+        predPD_home.append(tidy_rugby.r11_avg_pd[x] - 5.95 - tidy_rugby.r11_opp_pd[x])
+
+tidy_rugby['predPD_home'] = predPD_home
+
+w_l_home = []
+
+for x in x_list:
+    if predPD_home[x] > 0.0:
+        w_l_home.append(1)
+    elif predPD_home[x] < 0.0:
+        w_l_home.append(0)
+
+w_l_home
+
+tidy_rugby['w_l_home'] = w_l_home
+
+PD_win_acc = []
+home_win_acc = []
+
+for x in x_list:
+    if tidy_rugby.round[x] < 12:
+        if tidy_rugby.win[x] == tidy_rugby.w_l_avgPD[x]:
+            PD_win_acc.append(1)
+        else:
+            PD_win_acc.append(0)
+        if tidy_rugby.win[x] == tidy_rugby.w_l_home[x]:
+            home_win_acc.append(1)
+        else:
+            home_win_acc.append(0)
+    else:
+        PD_win_acc.append(0)
+        home_win_acc.append(0)
+
+tidy_rugby['PD_win_acc'] = PD_win_acc
+tidy_rugby['home_win_acc'] = home_win_acc
+
+PD_accuracy = sum(tidy_rugby.PD_win_acc) / 144.0
+home_accuracy = sum(tidy_rugby.home_win_acc) / 144.0
+PD_accuracy
+home_accuracy
+
+########################################################################
+# home field advantage (5.95) improved predictions by 10% in first half
+########################################################################
+
+########################################################################
+## I'd like to create a column that tracks average point              ##
+## differential over the season. Or rather, that shows each team's    ##
+## current average point differential going into that game.           ##
+## This should allow me to then calculate expected PD more            ##
+## effectively, and in real time for additional matches.              ##
+########################################################################
+
+########################################################################
+## First, I have created a function that gives me a list of average   ##
+## point differentials throughout the course of the season.           ##
+########################################################################
+
+def team_pd_change(a):
+    this_team = a
+    y_round = list(range(2,22))
+    team_pd_list = []
+    for y in y_round:
+        team_pd_list.append(tidy_rugby[tidy_rugby.team == this_team][tidy_rugby.round < y].points_diff.mean())
+    print team_pd_list
+    
+team_pd_change('bath')
+
+########################################################################
+## First, I have created a function that gives me a list of average   ##
+## point differentials throughout the course of the season.           ##
+########################################################################
+
+teams = teams[0:12]
+
+for team in teams:    
+    team_dict = {: team_pd_change(team)}
+    
+
+
+R12 = tidy_rugby[tidy_rugby.round < 13]
+
+R12[['team','r11_avg_pd','r11_opp_pd','pred_PD','points_diff']].head(12)
+R12[['team','w_l_avgPD','win']].head(12)
 
 ### error producer funcion ###
 
@@ -668,6 +848,8 @@ sum(pred_error)
 ########################################################################
 
 ## Team DataFrames ##
+
+rugby_first = rugby[rugby.round < 12]
 
 bath_df = rugby[rugby.team == 'bath']
 northampton_df = rugby[rugby.team == 'northampton']
