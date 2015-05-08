@@ -181,43 +181,32 @@ for x in x_centi:
 ### incorporating a home-field advantage of about 5.95 points
 
 ##########################################################################
-### creating a column that indicates each teams current table-rank ###
+###  ###
 ##########################################################################
 
-##########################################################################
-### first, create a function that gives a team's rank based on round ###
-##########################################################################
 
-y_rounds = list(range(1,21))
+feature_cols = ['home','avgPD','r11_opp_pd']
 
-league_points_todate = []
+X = rugby[rugby.round < 12][feature_cols]
+y = rugby[rugby.round < 12].predicted_win_loss
 
-league_round = 7
+from sklearn.cross_validation import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(X,y)
 
-northampton_table = []
-for x in x_list:
-    if rugby.team[x] == 'northampton':
-        games = rugby[rugby.index < x][rugby.team == 'northampton'].league_points_awarded
-        northampton_table.append(sum(games))
-northampton_table
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
 
-def league_points(a,b):
-    this_team = a
-    this_round = b
-    games_list = [] 
-    for x in x_list:
-        if rugby.team[x] == this_team:
-            games = rugby[rugby.index < x][rugby.team == this_team].league_points_awarded
-            games_list.append(sum(games))
-    games_list
-    print games_list[this_round]
+logreg.fit(x_train, y_train)
 
-table = []
+y_pred = logreg.predict(x_test)
 
-for x in x_list:
-    this_team = rugby.team[x]
-    this_round = rugby.round[x]
-    table_points = league_points(this_team,this_round)
-    table.append(table_points)
 
-table
+from sklearn import metrics
+metrics.accuracy_score(y_test,y_pred)
+metrics.confusion_matrix(y_test,y_pred)
+
+
+y_prob = logreg.predict_proba(x_test)[:,1]
+
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)

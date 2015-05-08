@@ -849,8 +849,6 @@ sum(pred_error)
 
 ## Team DataFrames ##
 
-rugby_first = rugby[rugby.round < 12]
-
 bath_df = rugby[rugby.team == 'bath']
 northampton_df = rugby[rugby.team == 'northampton']
 gloucester_df = rugby[rugby.team == 'gloucester']
@@ -884,79 +882,32 @@ exeter = exeter_df.set_index(['round'],drop=False)
 
 ########################################################################
 
-bath[bath.round == 3]
+def avgPD(team):
+    x_rounds = list(range(1,21))
+    avgPD = []
+    for x in x_rounds:
+        avgPD.append((sum(team.points_diff[0:x]))/x) 
+    team['avgPD'] = avgPD
+    team.avgPD
 
-########################################################################
+avgPD(bath)
+avgPD(northampton)
+avgPD(gloucester)
+avgPD(irish)
+avgPD(harlequins)
+avgPD(leicester)
+avgPD(newcastle)
+avgPD(saracens)
+avgPD(wasps)
+avgPD(sale)
+avgPD(welsh)
+avgPD(exeter)
 
-# Visualizations #
+team_df = [bath, northampton, gloucester, irish, harlequins, leicester,
+           newcastle, saracens, wasps, sale, welsh, exeter]
 
-########################################################################
+from pandas import concat
 
+rugby = concat(team_df)
 
-pd.scatter_matrix(bath_df)
-plt.show()
-
-rugby.groupby('team').points.mean().plot(kind='bar', title='Average Number of Points per Game')
-plt.show()
-
-rugby.boxplot(column='pen_goals',by='win')
-plt.xlabel('Win/Loss')
-plt.ylabel('Penalty Goals')
-plt.show()
-
-rugby.boxplot(column='tries',by='win')
-plt.xlabel('Win/Loss')
-plt.ylabel('Tries')
-plt.show()
-
-rugby.boxplot(column='conversions_made',by='win')
-plt.xlabel('Win/Loss')
-plt.ylabel('Conversions Made')
-plt.show()
-
-sns.lmplot(x='passes', y='meters_run', data=rugby)
-sns.lmplot(x='clean_breaks', y='defenders_beat', data=rugby)
-
-sns.lmplot(x='passes', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='meters_run', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='clean_breaks', y='points',data=rugby, order=2) #positive
-sns.lmplot(x='defenders_beat', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='rucks_won', y='points', data=rugby, order=2) #slightly negative
-sns.lmplot(x='rucks_started', y='points', data=rugby, order=2) #slightly negative
-sns.lmplot(x='tackles_missed', y='points', data=rugby, order=2) #useless
-sns.lmplot(x='tackles_made', y='points', data=rugby, order=2) #useless
-sns.lmplot(x='scrums_won', y='points', data=rugby, order=2) #useless
-sns.lmplot(x='turns_conceded', y='points', data=rugby, order=2) #negative
-sns.lmplot(x='offloads', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='kicks_from_hand', y='points', data=rugby, order=2) #pretty useless
-sns.lmplot(x='runs', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='meters_per_run', y='points', data=rugby, order=2) #positive
-sns.lmplot(x='tackle_success', y='points', data=rugby, order=2) #positive
-
-### 
-
-rugby.points.hist(bins=40)
-plt.title("Frequency of Points Scored by Single Team")
-plt.xlabel('Points Scored')
-plt.ylabel('Frequency')
-plt.show()
-
-rugby.tackles_made.hist(bins=40)
-plt.title("Distribution of Tackles per Game")
-plt.xlabel('Tackles Made')
-plt.ylabel('Frequency')
-plt.show()
-
-rugby[rugby.home == 1].win.hist(bins=2)
-plt.title("Win Rate for Home Teams")
-plt.xlabel('Win')
-plt.ylabel('Frequency')
-plt.show()
-
-rugby[rugby.home == 0].win.hist(bins=2)
-plt.title("Win Rate for Away Teams")
-plt.xlabel('Win')
-plt.ylabel('Frequency')
-plt.show()
-
-rugby[rugby.home == 1].win.value_counts()
+rugby.set_index(list(range(0,240)), drop=True)
