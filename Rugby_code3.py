@@ -11,11 +11,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.table import Table, Column
 import seaborn as sns
+from pandas import concat
 
+########################################################################
 ########################################################################
 
 rugby = pd.read_table('aviva_fixed.csv', sep=',') # import csv sheet
 
+########################################################################
 ########################################################################
 
 conversions_made = []
@@ -73,6 +76,7 @@ for row in rugby.tries:
 rugby['tries'] = tries
 
 ########################################################################
+########################################################################
 
 try_points = []
 
@@ -97,6 +101,7 @@ rugby['pen_points'] = pen_points
 
 rugby['points'] = rugby.try_points + rugby.con_points + rugby.pen_points
 
+########################################################################
 ########################################################################
 
 points = rugby.points
@@ -123,6 +128,7 @@ rugby['points_diff'] = points_diff
 rugby['points_against'] = rugby.points - rugby.points_diff
 
 ########################################################################
+########################################################################
 
 teams = rugby.team
 teams = list(teams)
@@ -138,11 +144,13 @@ for x in x_list:
 rugby['opponent'] = opponent
 
 ########################################################################
+########################################################################
 
 rugby = rugby[['season', 'game', 'round', 'team','home',
        'points','try_points','con_points','pen_points',
        'points_diff','points_against','opponent','win','draw']]
 
+########################################################################
 ########################################################################
 
 bath_df = rugby[rugby.team == 'bath']
@@ -158,6 +166,7 @@ sale_df = rugby[rugby.team == 'sale']
 welsh_df = rugby[rugby.team == 'welsh']
 exeter_df = rugby[rugby.team == 'exeter']
 
+########################################################################
 ########################################################################
 
 ### resetting the index for all of these data frames
@@ -176,6 +185,7 @@ sale = sale_df.set_index(['round'],drop=False)
 welsh = welsh_df.set_index(['round'],drop=False)
 exeter = exeter_df.set_index(['round'],drop=False)
 
+########################################################################
 ########################################################################
 
 def avgPD(team):
@@ -200,32 +210,125 @@ avgPD(welsh)
 avgPD(exeter)
 
 ########################################################################
+########################################################################
 
 def avgPD_opp(team):
     x_rounds = list(range(1,21))
     avgPD_opp = []
-    if team.opponent[x] == 'sale':
-        avgPD_opp.append(sale.avgPD[x])
-    elif team.opponent[x] == 'welsh':
-        avgPD_opp.append(welsh.avgPD[x])
-    elif team.opponent[x] == 'leicester':
-        avgPD_opp.append(leicester.avgPD[x])
-    elif team.opponen[x] == 'northampton':
-        avgPD_opp.append(northampton.avgPD[x])
-    elif team.opponent[x] == 'saracens':
-        avgPD_opp.append(saracens.avgPD[x])
-    elif team.opponent[x] == 'wasps':
-        avgPD_opp.append(wasps.avgPD[x])
-    elif team.opponent[x] == 'newcastle':
-        avgPD_opp.append(newcastle.avgPD[x])
-    elif team.opponent[x] == 'irish':
-        avgPD_opp.append(irish.avgPD[x])
-    elif team.opponent[x] == 'harlequins':
-        avgPD_opp.append(harlequins.avgPD[x])
-    elif team.opponent[x] == 'gloucester':
-        avgPD_opp.append(gloucester.avgPD[x])
-    elif team.opponent[x] == 'exeter':
-        avgPD_opp.append(exeter.avgPD[x])
-    avgPD_opp
-    
+    for x in x_rounds:    
+        if team.opponent[x] == 'sale':
+            avgPD_opp.append(sale.avgPD[x])
+        elif team.opponent[x] == 'welsh':
+            avgPD_opp.append(welsh.avgPD[x])
+        elif team.opponent[x] == 'leicester':
+            avgPD_opp.append(leicester.avgPD[x])
+        elif team.opponent[x] == 'northampton':
+            avgPD_opp.append(northampton.avgPD[x])
+        elif team.opponent[x] == 'saracens':
+            avgPD_opp.append(saracens.avgPD[x])
+        elif team.opponent[x] == 'wasps':
+            avgPD_opp.append(wasps.avgPD[x])
+        elif team.opponent[x] == 'newcastle':
+            avgPD_opp.append(newcastle.avgPD[x])
+        elif team.opponent[x] == 'irish':
+            avgPD_opp.append(irish.avgPD[x])
+        elif team.opponent[x] == 'harlequins':
+            avgPD_opp.append(harlequins.avgPD[x])
+        elif team.opponent[x] == 'gloucester':
+            avgPD_opp.append(gloucester.avgPD[x])
+        elif team.opponent[x] == 'exeter':
+            avgPD_opp.append(exeter.avgPD[x])
+        elif team.opponent[x] == 'bath':
+            avgPD_opp.append(bath.avgPD[x])
     team['avgPD_opp'] = avgPD_opp
+
+avgPD_opp(bath)
+avgPD_opp(northampton)
+avgPD_opp(gloucester)
+avgPD_opp(irish)
+avgPD_opp(harlequins)
+avgPD_opp(leicester)
+avgPD_opp(newcastle)
+avgPD_opp(saracens)
+avgPD_opp(wasps)
+avgPD_opp(sale)
+avgPD_opp(welsh)
+avgPD_opp(exeter)
+
+########################################################################
+########################################################################
+
+rugby1 = [bath, northampton, gloucester, irish, harlequins,leicester, newcastle, saracens, wasps,sale, welsh, exeter]
+rugby = concat(rugby1)
+
+########################################################################
+########################################################################
+
+from sklearn import metrics
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+
+########################################################################
+########################################################################
+
+feature_cols = ['avgPD','avgPD_opp','home']
+
+########################################################################
+########################################################################
+
+x_train = rugby[rugby.round < 12][feature_cols]
+y_train = rugby[rugby.round < 12]['win']
+
+x_test = rugby[rugby.round > 11][feature_cols]
+y_test = rugby[rugby.round > 11]['win']
+
+logreg.fit(x_train, y_train)
+
+logreg.coef_
+
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test,y_pred)
+metrics.confusion_matrix(y_test,y_pred)
+
+x_train = rugby[rugby.round < 13][feature_cols]
+y_train = rugby[rugby.round < 13]['win']
+x_test = rugby[rugby.round > 12][feature_cols]
+y_test = rugby[rugby.round > 12]['win']
+logreg.fit(x_train, y_train)
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test,y_pred)
+
+x_train = rugby[rugby.round < 14][feature_cols]
+y_train = rugby[rugby.round < 14]['win']
+x_test = rugby[rugby.round > 13][feature_cols]
+y_test = rugby[rugby.round > 13]['win']
+logreg.fit(x_train, y_train)
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test,y_pred)
+
+x_train = rugby[rugby.round < 15][feature_cols]
+y_train = rugby[rugby.round < 15]['win']
+x_test = rugby[rugby.round > 14][feature_cols]
+y_test = rugby[rugby.round > 14]['win']
+logreg.fit(x_train, y_train)
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test,y_pred)
+
+x_train = rugby[rugby.round < 16][feature_cols]
+y_train = rugby[rugby.round < 16]['win']
+x_test = rugby[rugby.round > 15][feature_cols]
+y_test = rugby[rugby.round > 15]['win']
+logreg.fit(x_train, y_train)
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test,y_pred)
+metrics.confusion_matrix(y_test,y_pred)
+
+x_train = rugby[rugby.round < 18][feature_cols]
+y_train = rugby[rugby.round < 18]['win']
+x_test = rugby[rugby.round > 17][feature_cols]
+y_test = rugby[rugby.round > 17]['win']
+logreg.fit(x_train, y_train)
+y_pred = logreg.predict(x_test)
+
+metrics.accuracy_score(y_test,y_pred)
+metrics.confusion_matrix(y_test,y_pred)
