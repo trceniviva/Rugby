@@ -5,6 +5,8 @@ Created on Fri May 15 23:52:35 2015
 @author: Trevor1
 """
 
+### Imports
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,50 +19,42 @@ from sklearn import metrics
 logreg = LogisticRegression()
 from sklearn.neighbors import KNeighborsClassifier  # import class 
 
+### Bringing in the dataset
+
 rugby = pd.read_table('rugbyfinal.csv', sep=',')
 
-del rugby['game']
+## creating last two features
 
 rugby['win_percent'] = (rugby['wins'] / (rugby['round'] - 1))
 rugby['opp_win_percent'] = (rugby['wins_opp'] / (rugby['round'] - 1))
 
-feature_cols = ['round','home','avgPD','avgPD_opp','wins','wins_opp']
+## naming feature columns
+
+feature_cols = ['home','win_percent','opp_win_percent','avgPD','avgPD_opp']
 
 full_cols = []
 
-x_train = rugby[rugby.round < 20][rugby.round > 1][feature_cols]
-y_train = rugby[rugby.round < 20][rugby.round > 1].points_diff
+## training on the first 18 rounds of each season
 
-x_test = rugby[rugby.round > 19][feature_cols]
-y_test = rugby[rugby.round > 19].points_diff
+x_train = rugby[rugby.round < 19][rugby.round > 1][feature_cols]
+y_train = rugby[rugby.round < 19][rugby.round > 1].win
 
-logreg.fit(x_train, y_train)
+## testing on 19, 20, 21, and 22 rounds
 
-y_pred = logreg.predict(x_test)
+x_test = rugby[rugby.round > 18][feature_cols]
+y_test = rugby[rugby.round > 18].win
 
-full_cols.append(metrics.accuracy_score(y_test,y_pred))
-
-full_cols
-
-logreg.coef_
-
-feature_cols = ['home','win_percent','opp_win_percent','avgPD']
-
-full_cols = []
-
-x_train = rugby[rugby.round < 20][rugby.round > 1][feature_cols]
-y_train = rugby[rugby.round < 20][rugby.round > 1].win
-
-x_test = rugby[rugby.round > 19][feature_cols]
-y_test = rugby[rugby.round > 19].win
+## fit the model
 
 logreg.fit(x_train, y_train)
 
+## create predictions
+
 y_pred = logreg.predict(x_test)
 
-full_cols.append(metrics.accuracy_score(y_test,y_pred))
+## test accuracy
 
-full_cols
+metrics.accuracy_score(y_test,y_pred)
 
 logreg.coef_
 
@@ -76,104 +70,91 @@ for x in x_list:
         false_positive.append(list_x[x])
     elif y_pred[x] < list_y[x]:
         false_negative.append(list_x[x])
-    
-    
 
 ###################################################################
 ###################################################################
 ###################################################################
-
-win_pred = []
 
 feature_cols = ['wins','wins_opp']
 
-x_tr18 = rugby[rugby.round < 20][rugby.round > 1][feature_cols]
-y_tr18 = rugby[rugby.round < 20][rugby.round > 1].win
+x_train = rugby[rugby.round < 19][rugby.round > 1][feature_cols]
+y_train = rugby[rugby.round < 19][rugby.round > 1].win
 
-x_t18 = rugby[rugby.round > 19][feature_cols]
-y_t18 = rugby[rugby.round > 19].win
+x_test = rugby[rugby.round > 18][feature_cols]
+y_test = rugby[rugby.round > 18].win
 
-logreg.fit(x_tr18, y_tr18)
+logreg.fit(x_train, y_train)
 
-y_p18 = logreg.predict(x_t18)
+y_pred = logreg.predict(x_test)
 
-win_pred.append(metrics.accuracy_score(y_t18,y_p18))
-metrics.confusion_matrix(y_t18,y_p18)
+metrics.accuracy_score(y_test,y_pred)
 
-win_pred
+logreg.coef_
 
 ###################################################################
 ###################################################################
 ###################################################################
-
-home_pred = []
 
 feature_cols = ['home']
 
-x_tr18 = rugby[rugby.round < 20][rugby.round > 1][feature_cols]
-y_tr18 = rugby[rugby.round < 20][rugby.round > 1].win
+x_train = rugby[rugby.round < 19][rugby.round > 1][feature_cols]
+y_train = rugby[rugby.round < 19][rugby.round > 1].win
 
-x_t18 = rugby[rugby.round > 19][feature_cols]
-y_t18 = rugby[rugby.round > 19].win
+x_test = rugby[rugby.round > 18][feature_cols]
+y_test = rugby[rugby.round > 18].win
 
-logreg.fit(x_tr18, y_tr18)
+logreg.fit(x_train, y_train)
 
-y_p18 = logreg.predict(x_t18)
+y_pred = logreg.predict(x_test)
 
-home_pred.append(metrics.accuracy_score(y_t18,y_p18))
-metrics.confusion_matrix(y_t18,y_p18)
+metrics.accuracy_score(y_test,y_pred)
 
-home_pred
+logreg.coef_
 
 ###################################################################
 ###################################################################
 ###################################################################
-
-home_win = []
 
 feature_cols = ['home','wins','wins_opp']
 
-x_tr18 = rugby[rugby.round < 20][rugby.round > 1][feature_cols]
-y_tr18 = rugby[rugby.round < 20][rugby.round > 1].win
+x_train = rugby[rugby.round < 19][rugby.round > 1][feature_cols]
+y_train = rugby[rugby.round < 19][rugby.round > 1].win
 
-x_t18 = rugby[rugby.round > 19][feature_cols]
-y_t18 = rugby[rugby.round > 19].win
+x_test = rugby[rugby.round > 18][feature_cols]
+y_test = rugby[rugby.round > 18].win
 
-logreg.fit(x_tr18, y_tr18)
+logreg.fit(x_train, y_train)
 
-y_p18 = logreg.predict(x_t18)
+y_pred = logreg.predict(x_test)
 
-home_win.append(metrics.accuracy_score(y_t18,y_p18))
-metrics.confusion_matrix(y_t18,y_p18)
+metrics.accuracy_score(y_test,y_pred)
 
-home_win
-
-###################################################################
-###################################################################
-###################################################################
-
-full_cols
-win_pred
-home_pred
+logreg.coef_
 
 ###################################################################
 ###################################################################
 ###################################################################
 
-feature_cols = ['home','avgPD','avgPD_opp','wins','wins_opp']
 
-knn = KNeighborsClassifier(n_neighbors=10)   
 
-x_trk = rugby[rugby.round < 20][rugby.round > 1][feature_cols]
-y_trk = rugby[rugby.round < 20][rugby.round > 1].win
+###################################################################
+###################################################################
+###################################################################
 
-x_tk = rugby[rugby.round > 19][feature_cols]
-y_tk = rugby[rugby.round > 19].win
+feature_cols = ['home','win_percent','opp_win_percent']
+
+knn = KNeighborsClassifier(n_neighbors=15)   
+
+x_trk = rugby[rugby.round < 19][rugby.round > 1][feature_cols]
+y_trk = rugby[rugby.round < 19][rugby.round > 1].win
+
+x_tk = rugby[rugby.round > 18][feature_cols]
+y_tk = rugby[rugby.round > 18].win
 
 knn.fit(x_trk, y_trk)
 y_pk = knn.predict(x_tk)
 
-print metrics.accuracy_score(y_tk, y_pk)
+metrics.accuracy_score(y_tk, y_pk)
 
 k_range = range(1, 30, 2)
 scores = []
