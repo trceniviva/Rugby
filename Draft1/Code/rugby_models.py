@@ -21,7 +21,10 @@ rugby = pd.read_table('rugbyfinal.csv', sep=',')
 
 del rugby['game']
 
-feature_cols = ['home','avgPD','avgPD_opp','wins','wins_opp']
+rugby['win_percent'] = rugby['wins'] / rugby['round']
+rugby['opp_win_percent'] = rugby['wins_opp'] / rugby['round']
+
+feature_cols = ['round','home','avgPD','avgPD_opp','wins','wins_opp']
 
 full_cols = []
 
@@ -41,7 +44,7 @@ full_cols
 
 logreg.coef_
 
-feature_cols = ['home','avgPD','wins','wins_opp']
+feature_cols = ['home','avgPD','avgPD_opp','win_percent','opp_win_percent']
 
 full_cols = []
 
