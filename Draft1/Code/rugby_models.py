@@ -21,8 +21,8 @@ rugby = pd.read_table('rugbyfinal.csv', sep=',')
 
 del rugby['game']
 
-rugby['win_percent'] = rugby['wins'] / rugby['round']
-rugby['opp_win_percent'] = rugby['wins_opp'] / rugby['round']
+rugby['win_percent'] = (rugby['wins'] / (rugby['round'] - 1))
+rugby['opp_win_percent'] = (rugby['wins_opp'] / (rugby['round'] - 1))
 
 feature_cols = ['round','home','avgPD','avgPD_opp','wins','wins_opp']
 
@@ -44,7 +44,7 @@ full_cols
 
 logreg.coef_
 
-feature_cols = ['home','avgPD','avgPD_opp','win_percent','opp_win_percent']
+feature_cols = ['home','win_percent','opp_win_percent','avgPD']
 
 full_cols = []
 
@@ -63,6 +63,21 @@ full_cols.append(metrics.accuracy_score(y_test,y_pred))
 full_cols
 
 logreg.coef_
+
+x_list = list(range(0,len(y_pred)))
+
+false_positive = []
+false_negative = []
+
+for x in x_list:
+    list_y = list(y_test)
+    list_x = list(x_test.index)
+    if y_pred[x] > list_y[x]:
+        false_positive.append(list_x[x])
+    elif y_pred[x] < list_y[x]:
+        false_negative.append(list_x[x])
+    
+    
 
 ###################################################################
 ###################################################################
