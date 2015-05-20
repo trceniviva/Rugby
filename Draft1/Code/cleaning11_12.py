@@ -139,20 +139,20 @@ for x in matches:
     stop2 = x.find(' - ')
     stop = stop + 1
     point = x[stop:stop2]
-    points.append(point)
+    points.append(float(point))
     stop3 = stop2 + 3
     backends.append(x[stop3:])
 
 for x in backends:
     stop = x.find('\xca')
     points_ag = x[:stop]
-    points_against.append(points_ag)
+    points_against.append(float(points_ag))
     stop2 = stop + 1
     opp = x[stop2:]
     opponent.append(opp)    
 
+points
 points_against    
-opponent
 
 teams = []
 
@@ -216,6 +216,6 @@ rugby['points_against'] = points_against
 rugby['opponent'] = opps
 del rugby['match']
 
-rugby
+rugby['points_diff'] = rugby['points'] - rugby['points_against']
 
 rugby.to_csv('1011_clean.csv')
