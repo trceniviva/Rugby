@@ -28,21 +28,42 @@ rugby = pd.read_table('rugbyfinal.csv', sep=',')
 rugby['win_percent'] = (rugby['wins'] / (rugby['round'] - 1))
 rugby['opp_win_percent'] = (rugby['wins_opp'] / (rugby['round'] - 1))
 
+## turning team and opponent into dumby variables
+## now my model will "know" which teams are playing
+
+for elem in rugby['team'].unique():
+    rugby[str(elem) + '_home'] = rugby['team'] == elem
+
+for elem in rugby['opponent'].unique():
+    rugby[str(elem) + '_opp'] = rugby['opponent'] == elem
+
+teams = (rugby['team'].unique() + '_home')
+opps = (rugby['team'].unique() + '_opp')
+
+## transforming booleans into 1's, 0's
+
+rugby[teams] = rugby[teams].astype(int)
+rugby[opps] = rugby[opps].astype(int)
+
+
 ## naming feature columns
 
-feature_cols = ['home','win_percent','opp_win_percent','avgPD','avgPD_opp']
-
-full_cols = []
+feature_cols = ['home','harlequins_home', 'exeter_home', 'sale_home', 'wasps_home',
+       'bath_home', 'gloucester_home', 'irish_home', 'leicester_home',
+       'worcester_home', 'saracens_home', 'newcastle_home',
+       'northampton_home', 'welsh_home','harlequins_opp', 'exeter_opp', 'sale_opp', 'wasps_opp', 'bath_opp',
+       'gloucester_opp', 'irish_opp', 'leicester_opp', 'worcester_opp',
+       'saracens_opp', 'newcastle_opp', 'northampton_opp', 'welsh_opp']
 
 ## training on the first 18 rounds of each season
 
 x_train = rugby[rugby.round < 19][rugby.round > 1][feature_cols]
-y_train = rugby[rugby.round < 19][rugby.round > 1].win
+y_train = rugby[rugby.round < 19][rugby.round > 1].points_diff
 
 ## testing on 19, 20, 21, and 22 rounds
 
 x_test = rugby[rugby.round > 18][feature_cols]
-y_test = rugby[rugby.round > 18].win
+y_test = rugby[rugby.round > 18].points_diff
 
 ## fit the model
 
