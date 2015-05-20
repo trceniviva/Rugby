@@ -23,7 +23,7 @@ from sklearn.neighbors import KNeighborsClassifier  # import class
 
 rugby = pd.read_table('rugbyfinal.csv', sep=',')
 
-## creating last two features
+## creating win percent features
 
 rugby['win_percent'] = (rugby['wins'] / (rugby['round'] - 1))
 rugby['opp_win_percent'] = (rugby['wins_opp'] / (rugby['round'] - 1))
@@ -89,6 +89,12 @@ seasons = ('season_' + rugby['season'].unique())
 
 rugby[seasons] = rugby[seasons].astype(int)
 
+## creating wins columns
+
+for elem in rugby['team'].unique():
+    rugby[str(elem) + '_wins'] = rugby[str(elem)] * rugby[str(elem) + '_home'] * rugby['wins']
+    rugby[str(elem) + '_Oppwins'] = rugby[str(elem)] * rugby[str(elem) + '_home'] * rugby['wins']
+    
 
 
 ## naming feature columns
