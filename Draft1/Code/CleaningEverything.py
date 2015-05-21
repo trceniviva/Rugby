@@ -5,7 +5,6 @@ Created on Mon May 18 19:28:22 2015
 @author: Trevor1
 """
 
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,6 +20,7 @@ from sklearn.neighbors import KNeighborsClassifier  # import class
 def feature_maker(df):
     match = ['match']
     rugby = pd.read_table(str(df), names=match, sep=',')
+    rugby
     matches = list(rugby.match)
     teamlist = []
     points = []
@@ -129,19 +129,33 @@ def feature_maker(df):
     for elem in rugby['team'].unique():
         rugby[elem] = rugby[elem] + rugby[elem + '_opp']
         del rugby[elem + '_opp']
+    ## setting the 'game'
     rugby['game'] = rugby.index + 1
+    negatives = [-1] * len(rugby)
+    rugby['negatives'] = negatives
+    ## filling in columns for points scored
     for elem in rugby['team'].unique():
         rugby[str(elem) + '_points1'] = rugby[str(elem) + '_home'] * rugby['points']
-        rugby[str(elem) + '_points2'] = (-1)(rugby[str(elem) + '_home'] - 1) * rugby['points_against']
+    for elem in rugby['team'].unique():
+        rugby[str(elem) + '_points2'] = ((rugby[str(elem) + '_home'] - rugby[elem]) * rugby['points_against']) * rugby['negatives']
+    for elem in rugby['team'].unique():
+        rugby[str(elem) + '_points'] = rugby[str(elem) + '_points1'] + rugby[str(elem) + '_points2']
+        del rugby[elem + '_points1']
+        del rugby[elem + '_points2']
+    rugby['round'] = rugby['game'] / 6 + 1
+    rugby['round'] = rugby['round'].astype(int)
+    df = df[-13:]
     rugby.to_csv('clean' + str(df))
 
 
-rugbyDFs = ['rugby1011.csv','rugby1112.csv','rugby1213.csv','rugby1314.csv','rugby1415.csv']
+rugbyDFs = ['rugby1011.csv',
+            'rugby1112.csv',
+            'rugby1213.csv',
+            'rugby1314.csv',
+            'rugby1415.csv']
 
 for df in rugbyDFs:
     feature_maker(df)
-
-
 
 
     rugby['harlequins'] = rugby['harlequins'] + rugby['harlequins_opp']
