@@ -148,6 +148,13 @@ metrics.log_loss(y_test,y_prob)
 
 #########################
 
+'''
+Now I'm looking at using the first 15 rounds from all the seasons
+in order to predict the outcome of the rest of those seasons.
+Additionally, once I've trained on the first 15 rounds of all seasons,
+I'll use that model to predict the second half of each season individually.
+'''
+
 x_train = rugby[rugby.round < 16][feature_cols]
 y_train = rugby[rugby.round < 16].win
 
@@ -250,3 +257,8 @@ k_list.append(metrics.accuracy_score(y_test, y_pred))
 ksum = sum(k_list)
 klen = len(k_list)
 ksum / klen
+
+###########################################################################
+########################## NEXT ######################################
+########################### MODELS ######################################
+###########################################################################
