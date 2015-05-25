@@ -21,100 +21,29 @@ from sklearn.neighbors import KNeighborsClassifier  # import class
 
 ### Bringing in the dataset
 
-rugby = pd.read_table('rugbyfinal.csv', sep=',')
-
-## creating win percent features
-
-rugby['win_percent'] = (rugby['wins'] / (rugby['round'] - 1))
-rugby['opp_win_percent'] = (rugby['wins_opp'] / (rugby['round'] - 1))
-
-rugby['win_percent'] = rugby['win_percent'].fillna(0)
-rugby['opp_win_percent'] = rugby['opp_win_percent'].fillna(0)
-
-## turning team and opponent into dumby variables
-## now my model will "know" which teams are playing
-
-for elem in rugby['team'].unique():
-    rugby[str(elem) + '_home'] = rugby['team'] == elem
-
-for elem in rugby['team'].unique():
-    rugby[str(elem)] = rugby['team'] == elem
-
-for elem in rugby['opponent'].unique():
-    rugby[str(elem) + '_opp'] = rugby['opponent'] == elem
-
-teams = rugby['team'].unique()
-teams_home = (rugby['team'].unique() + '_home')
-opps = (rugby['team'].unique() + '_opp')
-
-## transforming booleans into 1's, 0's
-
-rugby[teams_home] = rugby[teams_home].astype(int)
-rugby[opps] = rugby[opps].astype(int)
-rugby[teams] = rugby[teams].astype(int)
-
-rugby['harlequins'] = rugby['harlequins'] + rugby['harlequins_opp']
-del rugby['harlequins_opp']
-rugby['leicester'] = rugby['leicester'] + rugby['leicester_opp']
-del rugby['leicester_opp']
-rugby['exeter'] = rugby['exeter'] + rugby['exeter_opp']
-del rugby['exeter_opp']
-rugby['sale'] = rugby['sale'] + rugby['sale_opp']
-del rugby['sale_opp']
-rugby['wasps'] = rugby['wasps'] + rugby['wasps_opp']
-del rugby['wasps_opp']
-rugby['bath'] = rugby['bath'] + rugby['bath_opp']
-del rugby['bath_opp']
-rugby['gloucester'] = rugby['gloucester'] + rugby['gloucester_opp']
-del rugby['gloucester_opp']
-rugby['irish'] = rugby['irish'] + rugby['irish_opp']
-del rugby['irish_opp']
-rugby['worcester'] = rugby['worcester'] + rugby['worcester_opp']
-del rugby['worcester_opp']
-rugby['saracens'] = rugby['saracens'] + rugby['saracens_opp']
-del rugby['saracens_opp']
-rugby['newcastle'] = rugby['newcastle'] + rugby['newcastle_opp']
-del rugby['newcastle_opp']
-rugby['northampton'] = rugby['northampton'] + rugby['northampton_opp']
-del rugby['northampton_opp']
-rugby['welsh'] = rugby['welsh'] + rugby['welsh_opp']
-del rugby['welsh_opp']
-
-## creating dummy variables for seasons
-
-for elem in rugby['season'].unique():
-    rugby['season_' + str(elem)] = rugby['season'] == elem
-
-seasons = ('season_' + rugby['season'].unique())
-
-rugby[seasons] = rugby[seasons].astype(int)
-
-## creating wins columns
-
-for elem in rugby['team'].unique():
-    rugby[str(elem) + '_wins'] = rugby[str(elem)] * rugby[str(elem) + '_home'] * rugby['wins']
-    rugby[str(elem) + '_Oppwins'] = rugby[str(elem)] * rugby[str(elem) + '_home'] * rugby['wins']
-    
-
+rugby = pd.read_table('dataFINAL.csv', sep=',')
 
 ## naming feature columns
 
-feature_cols = ['harlequins_home', 'exeter_home', 'sale_home', 'wasps_home',
-       'bath_home', 'gloucester_home', 'irish_home', 'leicester_home',
-       'worcester_home', 'saracens_home', 'newcastle_home',
-       'northampton_home', 'welsh_home','harlequins', 'exeter', 'sale', 'wasps', 'bath', 'gloucester',
-       'irish', 'leicester', 'worcester', 'saracens', 'newcastle',
-       'northampton', 'welsh']
+feature_cols = ['sale_home', 'irish_home', 'exeter_home', 'wasps_home',
+                'northampton_home', 'yorkshire_home', 'newcastle_home',
+                'harlequins_home', 'bath_home', 'gloucester_home', 'leicester_home',
+                'saracens_home', 'worcester_home', 'welsh_home','sale_opp', 'irish_opp', 'exeter_opp', 'wasps_opp',
+                'northampton_opp', 'yorkshire_opp', 'newcastle_opp',
+                'harlequins_opp', 'bath_opp', 'gloucester_opp', 'leicester_opp',
+                'saracens_opp', 'worcester_opp', 'welsh_opp']
+                
+seasons = ['1011','1112','1213','1314','1415']
 
-## training on the first 18 rounds of each season
+## training on the first 15 rounds of each season
 
-x_train = rugby[rugby.season != '14_15'][rugby.round < 18][feature_cols]
-y_train = rugby[rugby.season != '14_15'][rugby.round < 18].win
+x_train = rugby[rugby['1011'] == 1][rugby.round < 16][feature_cols]
+y_train = rugby[rugby['1011'] == 1][rugby.round < 16].win
 
-## testing on 19, 20, 21, and 22 rounds
+## testing on the 16th through 22nd rounds
 
-x_test = rugby[rugby.season != '14_15'][rugby.round > 19][feature_cols]
-y_test = rugby[rugby.season != '14_15'][rugby.round > 19].win
+x_test = rugby[rugby['1011'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1011'] == 1][rugby.round > 15].win
 
 ## fit the model
 
@@ -124,9 +53,24 @@ logreg.fit(x_train, y_train)
 
 y_pred = logreg.predict(x_test)
 
-y_pred_final = logreg.predict(x_test)
-
 ## test accuracy
+
+metrics.accuracy_score(y_test,y_pred)
+logreg.coef_
+
+######################### 
+
+## repeat for the next season in my dataset
+
+x_train = rugby[rugby['1112'] == 1][rugby.round < 16][feature_cols]
+y_train = rugby[rugby['1112'] == 1][rugby.round < 16].win
+
+x_test = rugby[rugby['1112'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1112'] == 1][rugby.round > 15].win
+
+logreg.fit(x_train, y_train)
+
+y_pred = logreg.predict(x_test)
 
 metrics.accuracy_score(y_test,y_pred)
 
@@ -134,16 +78,66 @@ logreg.coef_
 
 ######################### 
 
-x_train_final = rugby[rugby.season != '14_15'][feature_cols]
-y_train_final = rugby[rugby.season != '14_15'].win
+x_train = rugby[rugby['1213'] == 1][rugby.round < 16][feature_cols]
+y_train = rugby[rugby['1213'] == 1][rugby.round < 16].win
 
-x_test_final = rugby[rugby.season == '14_15'][feature_cols]
-y_test_final = rugby[rugby.season == '14_15'].win
+x_test = rugby[rugby['1213'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1213'] == 1][rugby.round > 15].win
 
-logreg.fit(x_train_final, y_train_final)
+logreg.fit(x_train, y_train)
 
-y_pred_final = logreg.predict(x_test_final)
+y_pred = logreg.predict(x_test)
 
-metrics.accuracy_score(y_test_final,y_pred_final)
+metrics.accuracy_score(y_test,y_pred)
+
+logreg.coef_
 
 ######################### 
+
+x_train = rugby[rugby['1314'] == 1][rugby.round < 16][feature_cols]
+y_train = rugby[rugby['1314'] == 1][rugby.round < 16].win
+
+x_test = rugby[rugby['1314'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1314'] == 1][rugby.round > 15].win
+
+logreg.fit(x_train, y_train)
+
+y_pred = logreg.predict(x_test)
+
+metrics.accuracy_score(y_test,y_pred)
+
+logreg.coef_
+
+######################### 
+
+x_train = rugby[rugby['1415'] == 1][rugby.round < 16][feature_cols]
+y_train = rugby[rugby['1415'] == 1][rugby.round < 16].win
+
+x_test = rugby[rugby['1415'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1415'] == 1][rugby.round > 15].win
+
+logreg.fit(x_train, y_train)
+
+y_pred = logreg.predict(x_test)
+
+metrics.accuracy_score(y_test,y_pred)
+
+logreg.coef_
+
+#########################
+
+x_train = rugby[rugby.round < 16][feature_cols]
+y_train = rugby[rugby.round < 16].win
+
+x_test = rugby[rugby.round > 15][feature_cols]
+y_test = rugby[rugby.round > 15].win
+
+logreg.fit(x_train, y_train)
+
+y_pred = logreg.predict(x_test)
+
+metrics.accuracy_score(y_test,y_pred)
+logreg.coef_
+
+######################### 
+

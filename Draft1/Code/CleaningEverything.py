@@ -128,7 +128,6 @@ def feature_maker(df):
     rugby[teams] = rugby[teams].astype(int)
     for elem in rugby['team'].unique():
         rugby[elem] = rugby[elem] + rugby[elem + '_opp']
-        del rugby[elem + '_opp']
     ## setting the 'game'
     rugby['game'] = rugby.index + 1
     negatives = [-1] * len(rugby)
@@ -142,9 +141,23 @@ def feature_maker(df):
         rugby[str(elem) + '_points'] = rugby[str(elem) + '_points1'] + rugby[str(elem) + '_points2']
         del rugby[elem + '_points1']
         del rugby[elem + '_points2']
-    rugby['round'] = rugby['game'] / 6 + 1
+    # CREATING A WIN COLUMN FOR EACH TEAM
+    for elem in rugby['team'].unique():
+        rugby[str(elem) + '_win1'] = rugby[str(elem) + '_home'] * rugby['win']
+    for elem in rugby['team'].unique():
+        rugby[str(elem) + '_win2'] = ((rugby[str(elem) + '_home'] - rugby[elem]) * rugby['win']) * rugby['negatives']
+    for elem in rugby['team'].unique():
+        rugby[str(elem) + '_win'] = rugby[str(elem) + '_win1'] + rugby[str(elem) + '_win2']
+        del rugby[elem + '_win1']
+        del rugby[elem + '_win2']
+    rugby['round'] = (((rugby['game'] - 1) / 6) + 1)
     rugby['round'] = rugby['round'].astype(int)
     df = df[-13:]
+    rugby['season'] = df[5:9]
+    for elem in rugby['season'].unique():
+        rugby[str(elem)] = rugby['season'] == elem
+        rugby[str(elem)] = rugby[str(elem)].astype(int)
+    del rugby['season']
     rugby.to_csv('clean' + str(df))
 
 
@@ -157,54 +170,21 @@ rugbyDFs = ['rugby1011.csv',
 for df in rugbyDFs:
     feature_maker(df)
 
+cleanDFs = ['cleanrugby1011.csv',
+            'cleanrugby1112.csv',
+            'cleanrugby1213.csv',
+            'cleanrugby1314.csv',
+            'cleanrugby1415.csv']
 
-    rugby['harlequins'] = rugby['harlequins'] + rugby['harlequins_opp']
-    del rugby['harlequins_opp']
-    rugby['leicester'] = rugby['leicester'] + rugby['leicester_opp']
-    del rugby['leicester_opp']
-    rugby['exeter'] = rugby['exeter'] + rugby['exeter_opp']
-    del rugby['exeter_opp']
-    rugby['sale'] = rugby['sale'] + rugby['sale_opp']
-    del rugby['sale_opp']
-    rugby['wasps'] = rugby['wasps'] + rugby['wasps_opp']
-    del rugby['wasps_opp']
-    rugby['bath'] = rugby['bath'] + rugby['bath_opp']
-    del rugby['bath_opp']
-    rugby['gloucester'] = rugby['gloucester'] + rugby['gloucester_opp']
-    del rugby['gloucester_opp']
-    rugby['irish'] = rugby['irish'] + rugby['irish_opp']
-    del rugby['irish_opp']
-    if 'worcester' in rugby:
-        rugby['worcester'] = rugby['worcester'] + rugby['worcester_opp']
-        del rugby['worcester_opp']
-    rugby['saracens'] = rugby['saracens'] + rugby['saracens_opp']
-    del rugby['saracens_opp']
-    if 'newcastle' in rugby:    
-        rugby['newcastle'] = rugby['newcastle'] + rugby['newcastle_opp']
-        del rugby['newcastle_opp']
-    rugby['northampton'] = rugby['northampton'] + rugby['northampton_opp']
-    del rugby['northampton_opp']
-    if 'welsh' in rugby:
-        rugby['welsh'] = rugby['welsh'] + rugby['welsh_opp']
-        del rugby['welsh_opp']
-    if 'yorkshire' in rugby:
-        rugby['yorkshire'] = rugby['yorkshire'] + rugby['yorkshire_opp']
-        del rugby['yorkshire_opp']
+list_ = []
 
+for item in cleanDFs:
+    df = pd.read_csv(str(item))
+    list_.append(df)
+frame = pd.concat(list_)
+frame = frame.fillna(0)
+del frame['Unnamed: 0']
 
-    ## creating win percent features
-    rugby['win_percent'] = (rugby['wins'] / (rugby['round'] - 1))
-    rugby['opp_win_percent'] = (rugby['wins_opp'] / (rugby['round'] - 1))
-    rugby['win_percent'] = rugby['win_percent'].fillna(0)
-    rugby['opp_win_percent'] = rugby['opp_win_percent'].fillna(0)
-    
-    ## creating dummy variables for seasons
-    for elem in rugby['season'].unique():
-        rugby['season_' + str(elem)] = rugby['season'] == elem
-    seasons = ('season_' + rugby['season'].unique())
-    rugby[seasons] = rugby[seasons].astype(int)
-    
-    ## creating wins columns
-    for elem in rugby['team'].unique():
-        rugby[str(elem) + '_wins'] = rugby[str(elem)] * rugby[str(elem) + '_home'] * rugby['wins']
-        rugby[str(elem) + '_Oppwins'] = rugby[str(elem)] * rugby[str(elem) + '_home'] * rugby['wins']
+frame.to_csv('dataFINAL.csv')
+
+x_list = list(range(0,660))
