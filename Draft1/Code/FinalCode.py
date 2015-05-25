@@ -25,7 +25,9 @@ rugby = pd.read_table('dataFINAL.csv', sep=',')
 
 ## naming feature columns
 
-feature_cols = ['sale_home', 'irish_home', 'exeter_home', 'wasps_home',
+feature_cols = ['sale', 'irish', 'exeter', 'wasps', 'northampton', 'yorkshire',
+                'newcastle', 'harlequins', 'bath', 'gloucester', 'leicester',
+                'saracens', 'worcester', 'welsh','sale_home', 'irish_home', 'exeter_home', 'wasps_home',
                 'northampton_home', 'yorkshire_home', 'newcastle_home',
                 'harlequins_home', 'bath_home', 'gloucester_home', 'leicester_home',
                 'saracens_home', 'worcester_home', 'welsh_home','sale_opp', 'irish_opp', 'exeter_opp', 'wasps_opp',
@@ -33,7 +35,10 @@ feature_cols = ['sale_home', 'irish_home', 'exeter_home', 'wasps_home',
                 'harlequins_opp', 'bath_opp', 'gloucester_opp', 'leicester_opp',
                 'saracens_opp', 'worcester_opp', 'welsh_opp']
                 
-seasons = ['1011','1112','1213','1314','1415']
+###########################################################################
+########################## LOGISTIC #######################################
+######################### REGRESSION ######################################
+###########################################################################
 
 ## training on the first 15 rounds of each season
 
@@ -58,6 +63,15 @@ y_pred = logreg.predict(x_test)
 metrics.accuracy_score(y_test,y_pred)
 logreg.coef_
 
+# determine probability
+
+y_prob = logreg.predict_proba(x_test)[:,1]
+
+# test accuracy 
+
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)
+
 ######################### 
 
 ## repeat for the next season in my dataset
@@ -71,10 +85,12 @@ y_test = rugby[rugby['1112'] == 1][rugby.round > 15].win
 logreg.fit(x_train, y_train)
 
 y_pred = logreg.predict(x_test)
-
 metrics.accuracy_score(y_test,y_pred)
-
 logreg.coef_
+
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)
 
 ######################### 
 
@@ -87,10 +103,12 @@ y_test = rugby[rugby['1213'] == 1][rugby.round > 15].win
 logreg.fit(x_train, y_train)
 
 y_pred = logreg.predict(x_test)
-
 metrics.accuracy_score(y_test,y_pred)
-
 logreg.coef_
+
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)
 
 ######################### 
 
@@ -103,10 +121,12 @@ y_test = rugby[rugby['1314'] == 1][rugby.round > 15].win
 logreg.fit(x_train, y_train)
 
 y_pred = logreg.predict(x_test)
-
 metrics.accuracy_score(y_test,y_pred)
-
 logreg.coef_
+
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)
 
 ######################### 
 
@@ -119,10 +139,12 @@ y_test = rugby[rugby['1415'] == 1][rugby.round > 15].win
 logreg.fit(x_train, y_train)
 
 y_pred = logreg.predict(x_test)
-
 metrics.accuracy_score(y_test,y_pred)
-
 logreg.coef_
+
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)
 
 #########################
 
@@ -135,9 +157,96 @@ y_test = rugby[rugby.round > 15].win
 logreg.fit(x_train, y_train)
 
 y_pred = logreg.predict(x_test)
-
 metrics.accuracy_score(y_test,y_pred)
 logreg.coef_
 
-######################### 
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)
+metrics.log_loss(y_test,y_prob)
 
+x_test = rugby[rugby['1011'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1011'] == 1][rugby.round > 15].win
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test, y_pred)  
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)
+
+x_test = rugby[rugby['1112'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1112'] == 1][rugby.round > 15].win
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test, y_pred) 
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob) 
+
+x_test = rugby[rugby['1213'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1213'] == 1][rugby.round > 15].win
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test, y_pred)
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)  
+
+x_test = rugby[rugby['1314'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1314'] == 1][rugby.round > 15].win
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test, y_pred)
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)  
+
+x_test = rugby[rugby['1415'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1415'] == 1][rugby.round > 15].win
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test, y_pred)
+y_prob = logreg.predict_proba(x_test)[:,1]
+metrics.roc_auc_score(y_test,y_prob)  
+
+
+###########################################################################
+########################## K-NEAREST ######################################
+########################### NEIGHBOR ######################################
+###########################################################################
+
+x_train = rugby[rugby.round < 16][feature_cols]
+y_train = rugby[rugby.round < 16].win
+
+x_test = rugby[rugby.round > 15][feature_cols]
+y_test = rugby[rugby.round > 15].win
+
+knn = KNeighborsClassifier(n_neighbors=19)
+knn.fit(x_train, y_train)
+
+y_pred = knn.predict(x_test)
+metrics.accuracy_score(y_test, y_pred)  
+
+k_list = []
+
+knn = KNeighborsClassifier(n_neighbors=21)
+knn.fit(x_train, y_train)
+
+x_test = rugby[rugby['1011'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1011'] == 1][rugby.round > 15].win
+y_pred = knn.predict(x_test)
+k_list.append(metrics.accuracy_score(y_test, y_pred))  
+
+x_test = rugby[rugby['1112'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1112'] == 1][rugby.round > 15].win
+y_pred = knn.predict(x_test)
+k_list.append(metrics.accuracy_score(y_test, y_pred))  
+
+x_test = rugby[rugby['1213'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1213'] == 1][rugby.round > 15].win
+y_pred = knn.predict(x_test)
+k_list.append(metrics.accuracy_score(y_test, y_pred))  
+
+x_test = rugby[rugby['1314'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1314'] == 1][rugby.round > 15].win
+y_pred = knn.predict(x_test)
+k_list.append(metrics.accuracy_score(y_test, y_pred))  
+
+x_test = rugby[rugby['1415'] == 1][rugby.round > 15][feature_cols]
+y_test = rugby[rugby['1415'] == 1][rugby.round > 15].win
+y_pred = knn.predict(x_test)
+k_list.append(metrics.accuracy_score(y_test, y_pred))  
+
+ksum = sum(k_list)
+klen = len(k_list)
+ksum / klen
