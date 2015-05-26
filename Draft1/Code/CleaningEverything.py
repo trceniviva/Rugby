@@ -158,6 +158,8 @@ def feature_maker(df):
         rugby[str(elem)] = rugby['season'] == elem
         rugby[str(elem)] = rugby[str(elem)].astype(int)
     del rugby['season']
+    for elem in rugby['team'].unique():
+        rugby[str(elem) + '_win'] = rugby[str(elem)] * rugby['win']
     rugby.to_csv('clean' + str(df))
 
 
@@ -185,6 +187,37 @@ frame = pd.concat(list_)
 frame = frame.fillna(0)
 del frame['Unnamed: 0']
 
+frame.to_csv('dataALMOST.csv')
+
+rugby = pd.read_table('dataALMOST.csv', sep=',')
+
+for elem in rugby['team'].unique():
+    rugby[str(elem) + '_new_opp'] = rugby[str(elem)]
+    rugby[str(elem) + '_new_team'] = rugby[str(elem) + '_opp']
+    rugby[str(elem) + '_opp'] = rugby[str(elem) + '_new_opp']
+    rugby[str(elem)] = rugby[str(elem) + '_new_team']
+    del rugby[str(elem) + '_new_team']
+    del rugby[str(elem) + '_new_opp']
+
+rugby['win_fix'] = (rugby['win'] * rugby['negatives']) + 1
+rugby['win'] = rugby['win_fix']
+del rugby['win_fix']
+
+rugby['points_diff'] = rugby['points_diff'] * rugby['negatives']
+
+rugby.to_csv('data2.csv')
+
+fullDFs = ['dataALMOST.csv','data2.csv']
+
+list_ = []
+
+for item in fullDFs:
+    df = pd.read_csv(str(item))
+    list_.append(df)
+frame = pd.concat(list_)
+frame = frame.fillna(0)
+del frame['Unnamed: 0']
+
 frame.to_csv('dataFINAL.csv')
 
-x_list = list(range(0,660))
+rugby = pd.read_table('dataFINAL.csv',sep=',')
