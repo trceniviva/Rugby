@@ -217,10 +217,10 @@ I'll use that model to predict the second half of each season individually.
 '''
 
 x_train = rugby[rugby.round < 16][feature_cols]
-y_train = rugby[rugby.round < 16].win
+y_train = rugby[rugby.round < 16].points_diff
 
 x_test = rugby[rugby.round > 15][feature_cols]
-y_test = rugby[rugby.round > 15].win
+y_test = rugby[rugby.round > 15].points_diff
 
 logreg.fit(x_train, y_train)
 
@@ -229,27 +229,27 @@ metrics.accuracy_score(y_test,y_pred)
 logreg.coef_
 
 x_test = rugby[rugby['1011'] == 1][rugby.round > 15][feature_cols]
-y_test = rugby[rugby['1011'] == 1][rugby.round > 15].win
+y_test = rugby[rugby['1011'] == 1][rugby.round > 15].points_diff
 y_pred = logreg.predict(x_test)
 metrics.accuracy_score(y_test, y_pred)  
 
 x_test = rugby[rugby['1112'] == 1][rugby.round > 15][feature_cols]
-y_test = rugby[rugby['1112'] == 1][rugby.round > 15].win
+y_test = rugby[rugby['1112'] == 1][rugby.round > 15].points_diff
 y_pred = logreg.predict(x_test)
 metrics.accuracy_score(y_test, y_pred) 
 
 x_test = rugby[rugby['1213'] == 1][rugby.round > 15][feature_cols]
-y_test = rugby[rugby['1213'] == 1][rugby.round > 15].win
+y_test = rugby[rugby['1213'] == 1][rugby.round > 15].points_diff
 y_pred = logreg.predict(x_test)
 metrics.accuracy_score(y_test, y_pred)
 
 x_test = rugby[rugby['1314'] == 1][rugby.round > 15][feature_cols]
-y_test = rugby[rugby['1314'] == 1][rugby.round > 15].win
+y_test = rugby[rugby['1314'] == 1][rugby.round > 15].points_diff
 y_pred = logreg.predict(x_test)
 metrics.accuracy_score(y_test, y_pred)
 
 x_test = rugby[rugby['1415'] == 1][rugby.round > 15][feature_cols]
-y_test = rugby[rugby['1415'] == 1][rugby.round > 15].win
+y_test = rugby[rugby['1415'] == 1][rugby.round > 15].points_diff
 y_pred = logreg.predict(x_test)
 metrics.accuracy_score(y_test, y_pred)
 
