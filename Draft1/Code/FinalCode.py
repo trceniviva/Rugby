@@ -27,23 +27,20 @@ rugby = pd.read_table('dataFINAL.csv', sep=',')
 ########################## VISUALIZATIONS #################################
 ###########################################################################
 
-rugby.points_diff.hist(bins=20)
-plt.title("Distribution of Point Differentials")
-plt.xlabel('Point Difference')
-plt.ylabel('Frequency')
-plt.show()
-plt.savefig('dist_pointsdiff.png')  # save plot to file
+teams = ['sale', 'irish', 'exeter', 'wasps', 'northampton', 'yorkshire',
+                'newcastle', 'harlequins', 'bath', 'gloucester', 'leicester',
+                'saracens', 'worcester', 'welsh']
+
+for elem in teams:
+    rugby[elem] = rugby[elem] - rugby[str(elem) + '_home']
 
 ## naming feature columns
 
-feature_cols = ['sale', 'irish', 'exeter', 'wasps', 'northampton', 'yorkshire',
-                'newcastle', 'harlequins', 'bath', 'gloucester', 'leicester',
-                'saracens', 'worcester', 'welsh','sale_home', 'irish_home', 'exeter_home', 'wasps_home',
-                'northampton_home', 'yorkshire_home', 'newcastle_home',
-                'harlequins_home', 'bath_home', 'gloucester_home', 'leicester_home',
-                'saracens_home', 'worcester_home', 'welsh_home','sale_opp', 'irish_opp', 'exeter_opp', 'wasps_opp',
-                'northampton_opp', 'yorkshire_opp', 'newcastle_opp',
-                'harlequins_opp', 'bath_opp', 'gloucester_opp', 'leicester_opp',
+feature_cols = ['sale_home', 'irish_home', 'exeter_home',
+                'wasps_home', 'northampton_home', 'yorkshire_home',
+                'newcastle_home', 'harlequins_home', 'bath_home', 'gloucester_home', 'leicester_home',
+                'saracens_home', 'worcester_home', 'welsh_home','sale_opp', 'irish_opp', 'exeter_opp', 'wasps_opp', 'northampton_opp', 'yorkshire_opp',
+                'newcastle_opp', 'harlequins_opp', 'bath_opp', 'gloucester_opp', 'leicester_opp',
                 'saracens_opp', 'worcester_opp', 'welsh_opp']
                 
 
@@ -89,31 +86,68 @@ metrics.log_loss(y_test,y_prob)
 
 
 
-def logreg_(season_str,round_int):  
+def team_strengths(season_str,round_int):  
     
     x_train = rugby[rugby[str(season_str)] == 1][rugby.round < round_int][feature_cols]
-    y_train = rugby[rugby[str(season_str)] == 1][rugby.round < round_int].points_diff
+    y_train = rugby[rugby[str(season_str)] == 1][rugby.round < round_int].win
     
     x_test = rugby[rugby[str(season_str)] == 1][rugby.round == round_int][feature_cols]
-    y_test = rugby[rugby[str(season_str)] == 1][rugby.round == round_int].points_diff
+    y_test = rugby[rugby[str(season_str)] == 1][rugby.round == round_int].win
     
     logreg.fit(x_train, y_train)
     
     y_pred = logreg.predict(x_test)
-    accuracies.append(metrics.accuracy_score(y_test,y_pred))
-
+    metrics.accuracy_score(y_test,y_pred) 
+    
+    pred_list = y_pred
+    test_list = list(y_test)
+    errors = pred_list - test_list
+    sqerrors = []
+    for x in errors:
+        sqerrors.append(x ** 2)
+    error = sum(sqerrors) /  len(sqerrors)
+    error = error ** .5
+    print metrics.accuracy_score(y_test,y_pred)
+    accuracies.append(metrics.accuracy_score(y_test,y_pred))    
+    print 'For season ' + str(season_str) + ' round ' + str(round_int) + ','
+    print 'the expected strengths of each team are:'
+    print 'Sale:'
+    print logreg.coef_[round_int][0] * (-1)
+    print 'Irish:'
+    print logreg.coef_[round_int][1] * (-1)
+    print 'Exeter:'
+    print logreg.coef_[round_int][2] * (-1)
+    print 'Wasps:'
+    print logreg.coef_[round_int][3] * (-1)
+    print 'Northampton:'
+    print logreg.coef_[round_int][4] * (-1)
+    print 'Yorkshire:'
+    print logreg.coef_[round_int][5] * (-1) 
+    print 'Newcastle:'
+    print logreg.coef_[round_int][6] * (-1)
+    print 'Harlequins:'
+    print logreg.coef_[round_int][7] * (-1)
+    print 'Bath:'
+    print logreg.coef_[round_int][8] * (-1)
+    print 'Gloucester:'
+    print logreg.coef_[round_int][9] * (-1)
+    print 'Leicester:'
+    print logreg.coef_[round_int][10] * (-1)
+    print 'Saracens:'
+    print logreg.coef_[round_int][11] * (-1)
+    print 'Worcester:'
+    print logreg.coef_[round_int][12] * (-1)
+    print 'Welsh:'
+    print logreg.coef_[round_int][13] * (-1)
+      
+    
 seasons = ['1011','1112','1213','1314','1415']
 rounds = [15, 16, 17, 18, 19, 20, 21, 22]
 accuracies = []  
 
 for x in seasons:    
     for y in rounds:
-        logreg_(x,y)
-
-sum(accuracies)
-
-
-
+        team_strengths(x,y)
 
 y_prob = logreg.predict_proba(x_test)[:,1]
 metrics.roc_auc_score(y_test,y_prob)
@@ -308,3 +342,23 @@ y_pred = treereg.predict(x_test)
 scores = cross_val_score(treereg, x_train, y_train, cv=10, scoring='mean_squared_error')
 np.mean(np.sqrt(-scores))
 
+######################################################################
+########################## NEXT ######################################
+########################### MODELS ###################################
+######################################################################
+
+feature_cols = ['sale', 'irish', 'exeter', 'wasps', 'northampton', 'yorkshire',
+                'newcastle', 'harlequins', 'bath', 'gloucester', 'leicester',
+                'saracens', 'worcester', 'welsh']
+
+x_train = rugby[rugby['1011'] == 1][rugby.round < 16][feature_cols]
+y_train = rugby[rugby['1011'] == 1][rugby.round < 16].points_diff
+
+logreg.fit(x_train, y_train)
+logreg.coef_
+
+x_test = rugby[rugby['1011'] == 1][rugby.round == 16][feature_cols]
+y_test = rugby[rugby['1011'] == 1][rugby.round == 16].points_diff
+
+y_pred = logreg.predict(x_test)
+metrics.accuracy_score(y_test,y_pred)
